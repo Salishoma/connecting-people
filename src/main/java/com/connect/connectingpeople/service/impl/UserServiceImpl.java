@@ -1,5 +1,6 @@
 package com.connect.connectingpeople.service.impl;
 
+import com.connect.connectingpeople.model.SecurityUser;
 import com.connect.connectingpeople.model.UserDto;
 import com.connect.connectingpeople.model.UserEntity;
 import com.connect.connectingpeople.repository.UsersRepository;
@@ -7,16 +8,19 @@ import com.connect.connectingpeople.service.UsersService;
 import com.connect.connectingpeople.ui.model.CreateUserResponseModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
+import static com.connect.connectingpeople.enums.ApplicationUserRole.ADMIN;
+import static com.connect.connectingpeople.enums.ApplicationUserRole.USER;
 
 @Service
 public class UserServiceImpl implements UsersService {
@@ -33,9 +37,10 @@ public class UserServiceImpl implements UsersService {
     @Override
     public UserDto createUser(UserDto userDetails) {
         userDetails.setUserId(UUID.randomUUID().toString());
-        userDetails.setEncryptedPassword(passwordEncoder.encode(userDetails.getPassword()));
         ModelMapper mapper = new ModelMapper();
         UserEntity user = mapper.map(userDetails, UserEntity.class);
+        user.setEncryptedPassword(passwordEncoder.encode(userDetails.getPassword()));
+        user.setRole(USER);
         usersRepository.save(user);
         return userDetails;
     }
@@ -52,12 +57,16 @@ public class UserServiceImpl implements UsersService {
     @Override
     public CreateUserResponseModel findUser(String userId) {
         ModelMapper modelMapper = new ModelMapper();
-        UserEntity user = usersRepository.findById(userId).orElse(null);
+        UserEntity user = findUserFromRepo(userId);
         return user == null ? null : modelMapper.map(user, CreateUserResponseModel.class);
     }
 
+    private UserEntity findUserFromRepo(String userId){
+        return usersRepository.findById(userId).orElse(null);
+    }
+
     public UserDto findUserByUsername(String username){
-        UserEntity userEntity = usersRepository.findByEmail(username);
+        UserEntity userEntity = findByEmail(username);
         if(userEntity == null) {
             throw new UsernameNotFoundException(username);
         }
@@ -66,13 +75,19 @@ public class UserServiceImpl implements UsersService {
     }
 
     @Override
+    public UserEntity findByEmail(String username){
+        return usersRepository.findByEmail(username);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = usersRepository.findByEmail(username);
         if(userEntity == null) {
             throw new UsernameNotFoundException(username);
         }
+        Collection<? extends GrantedAuthority> authorities = userEntity.getRole().equals(ADMIN) ?
+                ADMIN.getGrantedAuthorities() : USER.getGrantedAuthorities();
 
-        return new User(
-                userEntity.getEmail(), userEntity.getEncryptedPassword(), true, true, true, true, new ArrayList<>());
+        return new SecurityUser(userEntity, authorities);
     }
 }

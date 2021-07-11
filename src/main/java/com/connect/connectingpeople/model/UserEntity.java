@@ -1,5 +1,6 @@
 package com.connect.connectingpeople.model;
 
+import com.connect.connectingpeople.enums.ApplicationUserRole;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -29,4 +30,6 @@ public class UserEntity implements Serializable {
 
     @Column(nullable=false, unique=true)
     private String encryptedPassword;
+
+    private ApplicationUserRole role;
 }

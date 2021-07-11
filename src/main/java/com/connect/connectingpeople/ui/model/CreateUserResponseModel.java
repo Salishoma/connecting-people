@@ -1,5 +1,6 @@
 package com.connect.connectingpeople.ui.model;
 
+import com.connect.connectingpeople.enums.ApplicationUserRole;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,4 +14,6 @@ public class CreateUserResponseModel {
     private String email;
 
     private String UserId;
+
+    private ApplicationUserRole role;
 }

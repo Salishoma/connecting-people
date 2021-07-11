@@ -12,11 +12,9 @@ public class UserDto implements Serializable {
 
     private String lastName;
 
-    private String password;
-
     private String email;
 
-    private String userId;
-    private String encryptedPassword;
+    private String password;
 
+    private String userId;
 }

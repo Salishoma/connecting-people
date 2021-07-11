@@ -1,5 +1,6 @@
 package com.connect.connectingpeople.security;
 
+import com.connect.connectingpeople.model.SecurityUser;
 import com.connect.connectingpeople.model.UserDto;
 import com.connect.connectingpeople.model.UserLogin;
 import com.connect.connectingpeople.service.UsersService;
@@ -12,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.crypto.SecretKey;
@@ -21,7 +21,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 
 import static java.util.Objects.requireNonNull;
@@ -48,14 +47,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         ObjectMapper mapper = new ObjectMapper();
         try{
-            UserLogin creds = mapper.readValue(request.getInputStream(), UserLogin.class);
-            return getAuthenticationManager().authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            creds.getEmail(),
-                            creds.getPassword(),
-                            new ArrayList<>()
-                    )
+            UserLogin cred = mapper.readValue(request.getInputStream(), UserLogin.class);
+
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                    cred.getEmail(),
+                    cred.getPassword()
             );
+            return getAuthenticationManager().authenticate(authentication);
         }catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -69,12 +67,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult)
             throws IOException, ServletException {
 
-        String username = ((User) authResult.getPrincipal()).getUsername();
-        System.out.println(username);
+        SecurityUser principal = (SecurityUser) authResult.getPrincipal();
+        String username = principal.getUsername();
         UserDto userDetails = userService.findUserByUsername(username);
 
         String token = Jwts.builder()
-                .setSubject(username)
+                .setSubject(userDetails.getUserId())
                 .claim("authorities", authResult.getAuthorities())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() +
