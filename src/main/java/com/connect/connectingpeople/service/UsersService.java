@@ -1,6 +1,7 @@
 package com.connect.connectingpeople.service;
 
 import com.connect.connectingpeople.model.UserDto;
+import com.connect.connectingpeople.model.UserEntity;
 import com.connect.connectingpeople.ui.model.CreateUserResponseModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -14,4 +15,6 @@ public interface UsersService extends UserDetailsService {
     CreateUserResponseModel findUser(String userId);
 
     UserDto findUserByUsername(String username);
+
+    UserEntity findByEmail(String email);
 }
