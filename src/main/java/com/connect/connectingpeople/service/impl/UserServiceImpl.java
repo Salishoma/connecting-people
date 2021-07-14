@@ -5,6 +5,7 @@ import com.connect.connectingpeople.model.UserDto;
 import com.connect.connectingpeople.model.UserEntity;
 import com.connect.connectingpeople.repository.UsersRepository;
 import com.connect.connectingpeople.service.UsersService;
+import com.connect.connectingpeople.ui.model.CreateUserRequestModel;
 import com.connect.connectingpeople.ui.model.CreateUserResponseModel;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,6 +78,27 @@ public class UserServiceImpl implements UsersService {
     @Override
     public UserEntity findByEmail(String username){
         return usersRepository.findByEmail(username);
+    }
+
+    @Override
+    public CreateUserResponseModel updateUser(String userId, CreateUserRequestModel recent) {
+        UserEntity user = usersRepository.findById(userId)
+                .orElse(null);
+        user.setFirstName(recent.getFirstName());
+        user.setLastName(recent.getLastName());
+        usersRepository.save(user);
+        return new ModelMapper().map(user, CreateUserResponseModel.class);
+    }
+
+    @Override
+    public boolean deleteUser(String userId) {
+        UserEntity entity = usersRepository.findById(userId)
+                .orElse(null);
+        if(entity == null){
+            return false;
+        }
+        usersRepository.deleteById(userId);
+        return true;
     }
 
     @Override

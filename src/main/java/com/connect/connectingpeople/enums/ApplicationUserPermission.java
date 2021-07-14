@@ -3,7 +3,6 @@ package com.connect.connectingpeople.enums;
 public enum ApplicationUserPermission {
     PROFILE_READ("profile:read"),
     PROFILE_WRITE("profile:write"),
-    PROFILE_UPDATE("profile:update"),
     PROFILE_DELETE("profile:delete");
 
     private final String permission;
