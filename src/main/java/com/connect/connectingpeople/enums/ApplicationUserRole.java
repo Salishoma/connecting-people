@@ -10,7 +10,7 @@ import static com.connect.connectingpeople.enums.ApplicationUserPermission.*;
 
 public enum ApplicationUserRole {
     USER(Sets.newHashSet(PROFILE_READ)),
-    ADMIN(Sets.newHashSet(PROFILE_READ, PROFILE_WRITE, PROFILE_UPDATE, PROFILE_DELETE));
+    ADMIN(Sets.newHashSet(PROFILE_READ, PROFILE_WRITE, PROFILE_DELETE));
 
     private final Set<ApplicationUserPermission> permissions;
 

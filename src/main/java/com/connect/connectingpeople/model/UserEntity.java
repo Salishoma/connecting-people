@@ -1,14 +1,16 @@
 package com.connect.connectingpeople.model;
 
 import com.connect.connectingpeople.enums.ApplicationUserRole;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Set;
 
 @Entity
-@Table(name="users")
+@Table(name="user")
 @Data
 public class UserEntity implements Serializable {
 
@@ -30,6 +32,10 @@ public class UserEntity implements Serializable {
 
     @Column(nullable=false, unique=true)
     private String encryptedPassword;
+
+    @JsonManagedReference(value="user-reference")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
+    private Set<Post> posts;
 
     private ApplicationUserRole role;
 }
