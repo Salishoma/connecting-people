@@ -1,6 +1,8 @@
 package com.connect.connectingpeople.model;
 
+import com.connect.connectingpeople.utils.ModelUtil;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,13 +10,14 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Comment {
+@JsonIgnoreProperties({"Likes"})
+public class Comment extends ModelUtil {
 
     @Id
     @GeneratedValue(generator="system-uuid")
@@ -23,8 +26,8 @@ public class Comment {
 
     private String comment;
 
-    @OneToMany
-    private List<Likes> likes;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Likes> likes;
 
     @JsonBackReference(value="post-reference")
     @ManyToOne
@@ -33,10 +36,14 @@ public class Comment {
 
     @JsonBackReference(value="user-reference")
     @ManyToOne
-    @JoinColumn(name = "userId")
     UserEntity user;
 
     private String fullName;
 
     private Date date;
+
+    @Override
+    public Set<Likes> getLikes() {
+        return likes;
+    }
 }

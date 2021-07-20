@@ -1,11 +1,13 @@
 package com.connect.connectingpeople.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Getter
@@ -14,6 +16,13 @@ import javax.persistence.Id;
 public class Likes {
 
     @Id
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     private String likesId;
 
+    @JsonBackReference(value="user-reference")
+    @ManyToOne
+    private UserEntity user;
+
+    private Date date;
 }
