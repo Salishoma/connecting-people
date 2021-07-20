@@ -1,6 +1,8 @@
 package com.connect.connectingpeople.model;
 
+import com.connect.connectingpeople.utils.ModelUtil;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,8 @@ import java.util.Set;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Post {
+@JsonIgnoreProperties({"Likes"})
+public class Post extends ModelUtil {
     @Id
     @GeneratedValue(generator="system-uuid")
     @GenericGenerator(name="system-uuid", strategy = "uuid")
@@ -28,7 +31,7 @@ public class Post {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
     private Set<Comment> comment;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Likes> likes;
 
     @JsonBackReference(value="user-reference")
@@ -36,4 +39,9 @@ public class Post {
     @JoinColumn(name = "userId")
     UserEntity user;
     private String fullName;
+
+    @Override
+    public Set<Likes> getLikes() {
+        return likes;
+    }
 }
