@@ -33,8 +33,8 @@ public class UserEntity implements Serializable {
     @Column(nullable=false, unique=true)
     private String encryptedPassword;
 
-    @JsonManagedReference
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user")
+    @JsonManagedReference(value="user-reference")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     private Set<Post> posts;
 
     private ApplicationUserRole role;

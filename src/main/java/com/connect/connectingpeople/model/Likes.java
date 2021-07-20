@@ -15,4 +15,5 @@ public class Likes {
 
     @Id
     private String likesId;
+
 }

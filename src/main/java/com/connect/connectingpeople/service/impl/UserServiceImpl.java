@@ -84,10 +84,13 @@ public class UserServiceImpl implements UsersService {
     public CreateUserResponseModel updateUser(String userId, CreateUserRequestModel recent) {
         UserEntity user = usersRepository.findById(userId)
                 .orElse(null);
-        user.setFirstName(recent.getFirstName());
-        user.setLastName(recent.getLastName());
-        usersRepository.save(user);
-        return new ModelMapper().map(user, CreateUserResponseModel.class);
+        if(user != null){
+            user.setFirstName(recent.getFirstName());
+            user.setLastName(recent.getLastName());
+            usersRepository.save(user);
+            return new ModelMapper().map(user, CreateUserResponseModel.class);
+        }
+        return null;
     }
 
     @Override

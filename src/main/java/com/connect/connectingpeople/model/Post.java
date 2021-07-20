@@ -1,6 +1,7 @@
 package com.connect.connectingpeople.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,7 +9,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -23,14 +24,16 @@ public class Post {
     private String post;
     private Date date;
 
-    @OneToMany
-    private List<Comment> comment;
+    @JsonManagedReference(value="post-reference")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
+    private Set<Comment> comment;
 
     @OneToMany
-    private List<Likes> like;
+    private Set<Likes> likes;
 
-    @JsonBackReference
+    @JsonBackReference(value="user-reference")
     @ManyToOne
     @JoinColumn(name = "userId")
     UserEntity user;
+    private String fullName;
 }

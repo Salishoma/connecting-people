@@ -5,7 +5,9 @@ import com.connect.connectingpeople.model.UserEntity;
 import com.connect.connectingpeople.repository.PostRepository;
 import com.connect.connectingpeople.repository.UsersRepository;
 import com.connect.connectingpeople.service.PostService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,7 @@ public class PostServiceImpl implements PostService {
     PostRepository postRepository;
     UsersRepository usersRepository;
 
+    @Autowired
     public PostServiceImpl(PostRepository postRepository, UsersRepository usersRepository) {
         this.postRepository = postRepository;
         this.usersRepository = usersRepository;
@@ -31,6 +34,7 @@ public class PostServiceImpl implements PostService {
         if(user != null){
             post.setDate(new Date());
             Set<Post> posts = user.getPosts();
+            post.setFullName(user.getFirstName() + " " + user.getLastName());
             posts.add(post);
             user.setPosts(posts);
             post.setUser(user);
@@ -68,11 +72,14 @@ public class PostServiceImpl implements PostService {
         return null;
     }
 
+    @Transactional
     @Override
     public boolean deletePost(String postId, String userId) {
         UserEntity user = usersRepository.findById(userId)
                 .orElse(null);
         if(user != null && hasPermission(user, postId)){
+            user.getPosts().remove(postRepository.findById(postId).orElse(null));
+            usersRepository.save(user);
             postRepository.deleteById(postId);
             return true;
         }
