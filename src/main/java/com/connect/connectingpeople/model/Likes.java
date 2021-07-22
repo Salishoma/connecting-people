@@ -10,6 +10,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
+@Table(name="likes")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,7 +18,8 @@ public class Likes {
 
     @Id
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
+    @Column(length = 60)
     private String likesId;
 
     @JsonBackReference(value="user-reference")

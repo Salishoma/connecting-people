@@ -25,7 +25,6 @@ public class AdminConfig {
     @Bean
     public void createAdmin(){
         UserEntity user = new UserEntity();
-        user.setId("1");
         user.setFirstName("Abubakar");
         user.setLastName("Salifu");
         user.setEmail("abubakar@gmail.com");
