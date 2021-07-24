@@ -44,8 +44,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
+                .antMatchers("/v2/api-docs/**", "/swagger.json", "/swagger-ui/**", "/swagger-ui.html",
+                        "/swagger-resources/**", "/webjars/**").permitAll()
                 .antMatchers(HttpMethod.POST,
-                        environment.getProperty("login.url.path"), "/api/users/").permitAll()
+        environment.getProperty("login.url.path"), "/api/users/").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
