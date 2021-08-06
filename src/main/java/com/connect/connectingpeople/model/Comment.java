@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.Set;
 
 @Entity
+@Table(name="comments")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,9 +22,11 @@ public class Comment extends ModelUtil {
 
     @Id
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
+    @Column(length = 60)
     private String commentId;
 
+    @Column(length = 250)
     private String comment;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -38,6 +41,7 @@ public class Comment extends ModelUtil {
     @ManyToOne
     UserEntity user;
 
+    @Column(length = 60)
     private String fullName;
 
     private Date date;

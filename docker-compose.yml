@@ -1,0 +1,25 @@
+version: "3"
+services:
+  connecting-people:
+    image: salishoma/connecting-people
+    ports:
+      - "8080:8080"
+    networks:
+      - mysql-connect
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysqldb/social_connect?serverTimezone=UTC
+    depends_on:
+      - mysqldb
+
+  mysqldb:
+    image: mysql:latest
+    networks:
+      - mysql-connect
+    environment:
+      - MYSQL_ROOT_PASSWORD=#$$standardsequence
+        - MYSQL_DATABASE=social_connect
+        - MYSQL_USER=oma
+        - MYSQL_PASSWORD=oma
+
+networks:
+  mysql-connect:

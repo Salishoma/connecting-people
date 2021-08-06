@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Entity
-@Table(name="user")
+@Table(name="users")
 @Data
 public class UserEntity implements Serializable {
 
@@ -18,7 +18,8 @@ public class UserEntity implements Serializable {
 
     @Id
     @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid2")
+    @Column(length = 60)
     private String id;
 
     @Column(nullable = false, length = 50)
@@ -30,7 +31,7 @@ public class UserEntity implements Serializable {
     @Column(nullable = false, length = 50, unique = true)
     private String email;
 
-    @Column(nullable=false, unique=true)
+    @Column(nullable=false, unique=true, length = 200)
     private String encryptedPassword;
 
     @JsonManagedReference(value="user-reference")
