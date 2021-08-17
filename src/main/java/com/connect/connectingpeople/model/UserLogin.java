@@ -1,11 +1,11 @@
 package com.connect.connectingpeople.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class UserLogin {
+import java.io.Serializable;
+
+@Data
+public class UserLogin  implements Serializable {
     private String email;
     private String password;
 }

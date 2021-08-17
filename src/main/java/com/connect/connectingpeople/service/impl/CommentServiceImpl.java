@@ -34,12 +34,12 @@ public class CommentServiceImpl implements CommentService {
                 .orElse(null);
         if(user != null && post != null){
             comment.setDate(new Date());
-            Set<Comment> comments = post.getComment();
+            Set<Comment> comments = post.getComments();
             comment.setFullName(user.getFirstName() + " " + user.getLastName());
             comment.setUser(user);
             comment.setPost(post);
             comments.add(comment);
-            post.setComment(comments);
+            post.setComments(comments);
             return commentRepository.save(comment);
         }
         return null;
@@ -60,7 +60,7 @@ public class CommentServiceImpl implements CommentService {
         Comment comment = commentRepository.findById(commentId)
                 .orElse(null);
         if(user != null && post != null && comment != null && comment.getUser().getId().equals(userId)){
-            Set<Comment> comments = post.getComment();
+            Set<Comment> comments = post.getComments();
             comment.setDate(new Date());
             comment.setComment(newComment.getComment());
             comments.add(comment);
