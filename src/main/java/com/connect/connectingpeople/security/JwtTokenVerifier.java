@@ -69,7 +69,7 @@ public class JwtTokenVerifier extends OncePerRequestFilter {
                 final UserDetails userDetails =
                         usersService.loadUserByUsername(username);
 
-                if (jwtTokenUtil.validateToken(token, userDetails)) {
+                if (userDetails != null && jwtTokenUtil.validateToken(token, userDetails)) {
                     Authentication authentication = new UsernamePasswordAuthenticationToken(
                             username,
                             null,

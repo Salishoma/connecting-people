@@ -32,8 +32,8 @@ import static com.connect.connectingpeople.enums.ApplicationUserRole.USER;
 public class UserController {
 
     private final UsersService usersService;
-    private AuthenticationManager authenticationManager;
-    private JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
 
     @Autowired
     public UserController(UsersService usersService,
@@ -52,12 +52,15 @@ public class UserController {
         ModelMapper modelMapper = new ModelMapper();
         UserDto userDto = modelMapper.map(userRequestModel, UserDto.class);
         UserDto createUser = usersService.createUser(userDto);
+        if(createUser == null){
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
         CreateUserResponseModel userResponseModel = modelMapper.map(createUser, CreateUserResponseModel.class);
         userResponseModel.setRole(USER);
         return new ResponseEntity<>(userResponseModel, HttpStatus.CREATED);
     }
 
-    @GetMapping(path="/", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+    @GetMapping(path="", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<List<CreateUserResponseModel>> getAllUsers(){
         List<CreateUserResponseModel> users = usersService.getUsers();
         return new ResponseEntity<>(users, HttpStatus.OK);
@@ -72,14 +75,14 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('profile:write') or principal == #userId")
+    @PreAuthorize("hasAuthority('profile:write') or principal == @emailSearch.getEmailFromId(#userId)")
     @PutMapping(path="/{userId}", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
     public ResponseEntity<CreateUserResponseModel> updateUser(@PathVariable String userId, @RequestBody CreateUserRequestModel requestModel){
         CreateUserResponseModel createUserResponseModel= usersService.updateUser(userId, requestModel);
         return new ResponseEntity<>(createUserResponseModel, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasAuthority('profile:delete') or principal == #userId")
+    @PreAuthorize("hasAuthority('profile:delete') or principal == @emailSearch.getEmailFromId(#userId)")
     @DeleteMapping(path="/{userId}")
     public String deleteUser(@PathVariable String userId){
         return usersService.deleteUser(userId) ? "User deleted" : "User does not exist in db";
@@ -97,7 +100,7 @@ public class UserController {
         CreateUserResponseModel userResponseModel = new ModelMapper()
                 .map(userEntity, CreateUserResponseModel.class);
 
-        final String token = jwtTokenUtil.generateToken(userDetails, authentication);
+        final String token = jwtTokenUtil.generateToken(userDetails, authentication, userEntity.getId());
         return ResponseEntity.ok(new JwtResponse<>(userResponseModel, token));
     }
 

@@ -38,6 +38,10 @@ public class UserServiceImpl implements UsersService {
     @Override
     public UserDto createUser(UserDto userDetails) {
         userDetails.setUserId(UUID.randomUUID().toString());
+        UserEntity userInDB = findByEmail(userDetails.getEmail());
+        if(userInDB != null){
+            return null;
+        }
         ModelMapper mapper = new ModelMapper();
         UserEntity user = mapper.map(userDetails, UserEntity.class);
         user.setEncryptedPassword(passwordEncoder.encode(userDetails.getPassword()));
@@ -107,12 +111,12 @@ public class UserServiceImpl implements UsersService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserEntity userEntity = usersRepository.findByEmail(username);
-        if(userEntity == null) {
-            throw new UsernameNotFoundException(username);
-        }
-        Collection<? extends GrantedAuthority> authorities = userEntity.getRole().equals(ADMIN) ?
-                ADMIN.getGrantedAuthorities() : USER.getGrantedAuthorities();
+        if(userEntity != null) {
+            Collection<? extends GrantedAuthority> authorities = userEntity.getRole().equals(ADMIN) ?
+                    ADMIN.getGrantedAuthorities() : USER.getGrantedAuthorities();
 
-        return new SecurityUser(userEntity, authorities);
+            return new SecurityUser(userEntity, authorities);
+        }
+        return null;
     }
 }

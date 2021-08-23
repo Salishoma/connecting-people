@@ -7,6 +7,8 @@ import com.connect.connectingpeople.repository.CommentRepository;
 import com.connect.connectingpeople.repository.PostRepository;
 import com.connect.connectingpeople.repository.UsersRepository;
 import com.connect.connectingpeople.service.CommentService;
+import com.connect.connectingpeople.ui.model.CommentResponseModel;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Comment createComment(Comment comment, String userId, String postId) {
+    public CommentResponseModel createComment(Comment comment, String userId, String postId) {
         Post post = postRepository.findById(postId)
                 .orElse(null);
         UserEntity user = usersRepository.findById(userId)
@@ -40,19 +42,21 @@ public class CommentServiceImpl implements CommentService {
             comment.setPost(post);
             comments.add(comment);
             post.setComments(comments);
-            return commentRepository.save(comment);
+            return new ModelMapper()
+                    .map(commentRepository.save(comment), CommentResponseModel.class);
         }
         return null;
     }
 
     @Override
-    public Comment findCommentById(String commentId) {
-        return commentRepository.findById(commentId)
-                .orElse(null);
+    public CommentResponseModel findCommentById(String commentId) {
+        return new ModelMapper()
+                .map(commentRepository.findById(commentId)
+                        .orElse(null), CommentResponseModel.class);
     }
 
     @Override
-    public Comment editComment(Comment newComment, String commentId, String postId, String userId) {
+    public CommentResponseModel editComment(Comment newComment, String commentId, String postId, String userId) {
         UserEntity user = usersRepository.findById(userId)
                 .orElse(null);
         Post post = postRepository.findById(postId)
@@ -65,7 +69,8 @@ public class CommentServiceImpl implements CommentService {
             comment.setComment(newComment.getComment());
             comments.add(comment);
             commentRepository.save(comment);
-            return comment;
+            return new ModelMapper()
+                    .map(commentRepository.save(comment), CommentResponseModel.class);
         }
         return null;
     }

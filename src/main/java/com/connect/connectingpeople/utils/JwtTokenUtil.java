@@ -59,17 +59,17 @@ public class JwtTokenUtil implements Serializable
     }
 
     // generate token for user
-    public String generateToken(UserDetails userDetails, Authentication authentication) {
+    public String generateToken(UserDetails userDetails, Authentication authentication, String userId) {
         String username = userDetails.getUsername();
-        return doGenerateToken(authentication, username);
+        return doGenerateToken(authentication, username, userId);
     }
 
-    @Deprecated
-    private String doGenerateToken(Authentication authentication, String subject) {
-        return Jwts.builder().claim("authorities", authentication.getAuthorities()).setSubject(subject)
+    private String doGenerateToken(Authentication authentication, String subject, String userId) {
+        return Jwts.builder().claim("authorities", authentication.getAuthorities())
+                .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + Long.parseLong(requireNonNull(environment.getProperty("token.expiration_time")))))
-                .signWith(SignatureAlgorithm.HS512, secretKey).compact();
+                .signWith(secretKey, SignatureAlgorithm.HS512).compact();
     }
 
     // validate token

@@ -5,6 +5,8 @@ import com.connect.connectingpeople.model.UserEntity;
 import com.connect.connectingpeople.repository.PostRepository;
 import com.connect.connectingpeople.repository.UsersRepository;
 import com.connect.connectingpeople.service.PostService;
+import com.connect.connectingpeople.ui.model.PostResponseModel;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.connect.connectingpeople.enums.ApplicationUserRole.ADMIN;
 
@@ -28,35 +31,46 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Post createPost(Post post, String userId) {
-        UserEntity user = usersRepository.findById(userId)
-                .orElse(null);
+    public PostResponseModel createPost(Post post, String username) {
+        UserEntity user = usersRepository.findByEmail(username);
         if(user != null){
             post.setDate(new Date());
             Set<Post> posts = user.getPosts();
             post.setFullName(user.getFirstName() + " " + user.getLastName());
             posts.add(post);
+            ModelMapper mapper = new ModelMapper();
+            PostResponseModel postResponseModel = mapper.map(post, PostResponseModel.class);
             user.setPosts(posts);
             post.setUser(user);
-            return postRepository.save(post);
+            postRepository.save(post);
+            return postResponseModel;
         }
         return null;
     }
 
     @Override
-    public List<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<PostResponseModel> getAllPosts() {
+        List<Post> posts = postRepository.findAll();
+        return posts.stream()
+                .map(post -> new ModelMapper()
+                        .map(post, PostResponseModel.class))
+                .collect(Collectors.toList());
     }
 
     @Override
-    public Post getPost(String postId) {
-        return postRepository.findById(postId)
+    public PostResponseModel getPost(String postId) {
+        Post post = postRepository.findById(postId)
                 .orElse(null);
+        if(post != null){
+            ModelMapper mapper = new ModelMapper();
+            return mapper.map(post, PostResponseModel.class);
+        }
+        return null;
     }
 
     @Override
-    public Post editPost(String postId, String userId, Post newPost) {
-        UserEntity user = usersRepository.findById(userId)
+    public PostResponseModel editPost(String postId, String username, Post newPost) {
+        UserEntity user = usersRepository.findById(username)
                 .orElse(null);
         Post post = postRepository.findById(postId)
                 .orElse(null);
@@ -67,7 +81,8 @@ public class PostServiceImpl implements PostService {
             post.setPost(newPost.getPost());
             posts.add(post);
             postRepository.save(post);
-            return post;
+            ModelMapper mapper = new ModelMapper();
+            return mapper.map(post, PostResponseModel.class);
         }
         return null;
     }
