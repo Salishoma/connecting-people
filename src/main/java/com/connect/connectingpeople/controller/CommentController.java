@@ -2,6 +2,7 @@ package com.connect.connectingpeople.controller;
 
 import com.connect.connectingpeople.model.Comment;
 import com.connect.connectingpeople.service.CommentService;
+import com.connect.connectingpeople.ui.model.CommentResponseModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -24,22 +25,22 @@ public class CommentController {
             consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE},
             produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE}
             )
-    public ResponseEntity<Comment> createNewComment(@PathVariable String postId, @RequestBody Comment comment, Principal principal){
+    public ResponseEntity<CommentResponseModel> createNewComment(@PathVariable String postId, @RequestBody Comment comment, Principal principal){
         String userId = principal.getName();
-        Comment newComment = commentService.createComment(comment, userId, postId);
+        CommentResponseModel newComment = commentService.createComment(comment, userId, postId);
         return new ResponseEntity<>(newComment, HttpStatus.CREATED);
     }
 
     @GetMapping(path="/comments/{commentId}",produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<Comment> getComment(@PathVariable String commentId){
-        Comment newComment = commentService.findCommentById(commentId);
+    public ResponseEntity<CommentResponseModel> getComment(@PathVariable String commentId){
+        CommentResponseModel newComment = commentService.findCommentById(commentId);
         return new ResponseEntity<>(newComment, HttpStatus.OK);
     }
 
     @PutMapping(path="{postId}/comments/{commentId}",produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-    public ResponseEntity<Comment> editComment(@PathVariable String commentId, @PathVariable String postId, @RequestBody Comment newComment, Principal principal){
+    public ResponseEntity<CommentResponseModel> editComment(@PathVariable String commentId, @PathVariable String postId, @RequestBody Comment newComment, Principal principal){
         String userId = principal.getName();
-        Comment comment = commentService.editComment(newComment, commentId, postId, userId);
+        CommentResponseModel comment = commentService.editComment(newComment, commentId, postId, userId);
         if(comment == null){
             return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
         }

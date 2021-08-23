@@ -1,7 +1,7 @@
 version: "3"
 services:
   connecting-people:
-    image: salishoma/connecting-people
+    image: salishoma/connecting-people:latest
     ports:
       - "8080:8080"
     networks:

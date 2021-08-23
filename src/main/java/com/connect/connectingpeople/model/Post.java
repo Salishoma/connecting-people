@@ -33,7 +33,7 @@ public class Post extends ModelUtil {
 
     @JsonManagedReference(value="post-reference")
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "post", orphanRemoval = true)
-    private Set<Comment> comment;
+    private Set<Comment> comments;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Likes> likes;
